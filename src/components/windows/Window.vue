@@ -22,82 +22,136 @@
           <div class="window-actions">
             <button
               v-if="closeable"
+              class="window-action window-action-minimize"
+              @click="minimize"
+            ></button>
+            <button
+              v-if="closeable"
               class="window-action window-action-close"
               @click="close"
             ></button>
           </div>
         </div>
       </template>
-      <div class="window-content">
-        <slot />
+      <div class="window-content" :style="computedContentStyle">
+        <div class="window-content-body">
+          <slot />
+        </div>
+        <div class="window-footer">
+          <slot name="footer" />
+        </div>
       </div>
     </div>
   </transition>
 </template>
 
 <style lang="stylus">
-.window
-  position absolute
-  width 320px
-  height 240px
-  background #E0E0E0
-  color: #333
-  border-radius: 8px
-  overflow hidden
-  border: 1px solid #000
-  box-shadow: 0 0 0 rgba(#000,.82)
-  resize both
-  font-size 14px
-  min-width 128px
-  min-height 128px
-  max-width 100%
-  max-height 80vh
-  outline none
-  transition all .21s ease, top, left, width, height 0s
-  font bold 13px Roboto, Arial, sans-serif
-  &-title
-    display flex
-    flex-direction row
-    align-items center
-    background #568ba4
-    padding .5em
-    border 2px double #69a6c3
-    border-bottom none
-    border-radius 8px 8px 0 0
-    cursor default
-    &-text
-      flex 1
-      color #FFF
-      text-align center
+.window {
+  position: absolute;
+  background: #E0E0E0;
+  color: #333;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #000;
+  box-shadow: 0 0 0 rgba(#000, 0.82);
+  font-size: 14px;
+  max-width: 100%;
+  outline: none;
+  transition: all 0.21s ease, top, left, width, height 0s;
+  font: 13px Roboto, Arial, sans-serif;
 
-  &--focused
-    box-shadow: 0 4px 8px rgba(#000,.82), 0 4px 0 rgba(#000,.82)
-    z-index 99999999
+  &-title {
+    flex: 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #568ba4;
+    padding: 0.5em;
+    border: 2px double #69a6c3;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: default;
 
-  &-action
-    width 20px
-    height 20px
-    border none
-    background-color transparent
-    background-image url('./assets/controls.png')
-    background-repeat no-repeat
+    &-text {
+      flex: 1;
+      color: #FFF;
+      text-align: center;
+    }
+  }
 
-    &-close
-      background-position -140px -10px
-      &:hover
-        background-position -200px -10px
-      &:active
-        background-position -169px -10px
+  &-content {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    resize: both;
+    position: relative;
+    padding: 1em;
 
-.popup
-  &-enter-active,
-  &-leave-active
-    transform scale(1)
-    opacity 1
-  &-enter,
-  &-leave-to
-    transform scale(.809)
-    opacity 0
+    &-body {
+      flex: 1;
+    }
+  }
+
+  &--focused {
+    box-shadow: 0 4px 8px rgba(#000, 0.82), 0 4px 0 rgba(#000, 0.82);
+    z-index: 99999999;
+  }
+
+  &-action {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-color: transparent;
+    background-image: url('./assets/controls.png');
+    background-repeat: no-repeat;
+    cursor pointer
+    margin: 0 2px
+
+    &-close {
+      background-position: -140px -10px;
+
+      &:hover {
+        background-position: -200px -10px;
+      }
+
+      &:active {
+        background-position: -169px -10px;
+      }
+    }
+
+    &-minimize {
+      background-image: url('./assets/minimize.png');
+
+      &:hover {
+        opacity .82
+      }
+
+      &:active {
+        background-image: url('./assets/minimize-press.png');
+      }
+    }
+  }
+
+  &-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.25em 0.5em;
+  }
+}
+
+.popup {
+  &-enter-active, &-leave-active {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  &-enter, &-leave-to {
+    transform: scale(0.809);
+    opacity: 0;
+  }
+}
 </style>
 
 <script lang="ts">
@@ -111,6 +165,8 @@ export default class Window extends Vue {
   @Prop({ type: Boolean, default: true }) focused?: boolean
   @Prop({ type: Boolean, default: true }) titlebar?: boolean
   @Prop({ type: Boolean, default: true }) closeable?: boolean
+  @Prop({ type: Boolean, default: false }) minimizable?: boolean
+  @Prop({ type: Boolean, default: false }) minimized?: boolean
   @Prop({ type: Boolean, default: true }) value?: boolean
   @Prop({ type: Number }) x?: number
   @Prop({ type: Number }) y?: number
@@ -119,7 +175,7 @@ export default class Window extends Vue {
   @Prop({ type: String, default: 'Message' }) title?: string
 
   @Watch('value')
-  setVisibility(visible: boolean) {
+  private setVisibility(visible: boolean) {
     this.current.value = visible
   }
 
@@ -178,7 +234,12 @@ export default class Window extends Vue {
   get computedStyle() {
     return {
       top: `${this.current.y}px`,
-      left: `${this.current.x}px`,
+      left: `${this.current.x}px`
+    }
+  }
+
+  get computedContentStyle() {
+    return {
       width: `${this.current.width}px`,
       height: `${this.current.height}px`
     }
@@ -187,6 +248,14 @@ export default class Window extends Vue {
   close() {
     this.current.value = false
     this.$emit('input', this.current.value)
+    this.$emit('close')
+  }
+
+  minimize() {
+    this.current.value = false
+
+    this.$emit('input', this.current.value)
+    this.$emit('update:minimized', this.current.minimized)
   }
 
   mounted() {
