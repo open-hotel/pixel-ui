@@ -4,7 +4,8 @@ import {
   Window,
   Button,
   TabList,
-  TabListItem
+  TabListItem,
+  TabView
 } from './components'
 
 Vue.component('px-btn', Button)
@@ -14,4 +15,4 @@ Vue.component('px-window', Window)
 
 Vue.component('px-tab-list', TabList)
 Vue.component('px-tab-list-item', TabListItem)
-Vue.component('px-tab-view', TabListItem)
+Vue.component('px-tab-view', TabView)
