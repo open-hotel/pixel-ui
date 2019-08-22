@@ -2,7 +2,10 @@
   <transition name="popup">
     <div
       v-if="current.value"
-      :class="['window', { 'window--focused': current.focused }]"
+      :class="[
+        'window',
+        { 'window--focused': current.focused, 'window--resizable': resizable }
+      ]"
       tabindex="-1"
       :style="computedStyle"
       ref="window"
@@ -83,12 +86,21 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
-    resize: both;
     position: relative;
     padding: 1em;
+    min-width: 128px;
+    min-height: 128px;
 
     &-body {
       flex: 1;
+    }
+  }
+
+  &--resizable {
+    p(selector());
+
+    ^[0]-content {
+      resize: both;
     }
   }
 
@@ -104,8 +116,8 @@
     background-color: transparent;
     background-image: url('./assets/controls.png');
     background-repeat: no-repeat;
-    cursor pointer
-    margin: 0 2px
+    cursor: pointer;
+    margin: 0 2px;
 
     &-close {
       background-position: -140px -10px;
@@ -123,7 +135,7 @@
       background-image: url('./assets/minimize.png');
 
       &:hover {
-        opacity .82
+        opacity: 0.82;
       }
 
       &:active {
@@ -148,7 +160,7 @@
   }
 
   &-enter, &-leave-to {
-    transform: scale(0.809);
+    transform: scale(.95)
     opacity: 0;
   }
 }
@@ -166,6 +178,7 @@ export default class Window extends Vue {
   @Prop({ type: Boolean, default: true }) titlebar?: boolean
   @Prop({ type: Boolean, default: true }) closeable?: boolean
   @Prop({ type: Boolean, default: false }) minimizable?: boolean
+  @Prop({ type: Boolean, default: true }) resizable?: boolean
   @Prop({ type: Boolean, default: false }) minimized?: boolean
   @Prop({ type: Boolean, default: true }) value?: boolean
   @Prop({ type: Number }) x?: number
@@ -255,7 +268,7 @@ export default class Window extends Vue {
     this.current.value = false
 
     this.$emit('input', this.current.value)
-    this.$emit('update:minimized', this.current.minimized)
+    this.$emit('update:minimized', true)
   }
 
   mounted() {
