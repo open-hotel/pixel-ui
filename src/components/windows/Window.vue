@@ -69,13 +69,13 @@
   outline: none;
   transition: box-shadow 0.21s ease;
   font: 13px Roboto, Arial, sans-serif;
+  background: #568ba4;
 
   &-title {
     flex: 0 auto;
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: #568ba4;
     padding: 0.5em;
     border: 2px double rgba(#FFF, 25%);
     border-bottom: none;
@@ -198,10 +198,10 @@ export default class Window extends Vue {
   @Prop({ type: Number }) y!: number
   @Prop({ type: Number }) width!: number
   @Prop({ type: Number }) height!: number
-  @Prop({ type: Number, default: 128 }) minWidth!: number
-  @Prop({ type: Number, default: 128 }) minHeight!: number
+  @Prop({ type: Number, default: 38 }) minWidth!: number
+  @Prop({ type: Number, default: 38 }) minHeight!: number
   @Prop({ type: Number, default: 800 }) maxWidth!: number
-  @Prop({ type: Number, default: 600 }) maxHeight!: number
+  @Prop({ type: Number, default: 400 }) maxHeight!: number
   @Prop({ type: String, default: 'Message' }) title!: string
 
   @Watch('focused')
@@ -277,20 +277,16 @@ export default class Window extends Vue {
 
   private handleResize(e: Event) {
     const { clientX, clientY } = e as PointerEvent
-    const $el = e.target as any
+    const $el = e.target as HTMLDivElement
     const width = clientX - this.current.x
-    const height = clientY - this.current.y
+    const height = clientY - (this.current.y + 38)
     this.current = {
       ...this.current,
       width: this.normalizeValue(width, this.minWidth, this.maxWidth),
       height: this.normalizeValue(height, this.minHeight, this.maxHeight)
     }
 
-    this.$emit('resize', {
-      width: this.current.width,
-      height: this.current.height
-    })
-
+    this.$emit('resize', this.current)
     this.$emit('update:width', this.current.width)
     this.$emit('update:height', this.current.height)
   }
@@ -339,14 +335,13 @@ export default class Window extends Vue {
       (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
     const minX = (titlebar && 16 - titlebar.offsetWidth) || -Infinity
     const minY = 0
-    const maxWidth = (parentEl && parentEl.offsetWidth) || Infinity
-    const maxHeight = (parentEl && parentEl.offsetHeight) || Infinity
+    const { x, y, width, height } = this.current
 
     return {
-      top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
-      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`,
-      width: `${this.normalizeValue(this.current.width, 128, maxWidth)}px`,
-      height: `${this.normalizeValue(this.current.height, 128, maxHeight)}px`
+      top: `${this.normalizeValue(y, minY, maxY)}px`,
+      left: `${this.normalizeValue(x, minX, maxX)}px`,
+      width: `${this.normalizeValue(width, this.minWidth, this.maxWidth)}px`,
+      height: `${this.normalizeValue(height, this.minHeight, this.maxHeight)}px`
     }
   }
 
