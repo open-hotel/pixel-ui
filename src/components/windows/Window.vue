@@ -160,7 +160,7 @@
   }
 
   &-enter, &-leave-to {
-    transform: scale(.95)
+    transform: scale(0.95);
     opacity: 0;
   }
 }
@@ -181,6 +181,7 @@ export default class Window extends Vue {
   @Prop({ type: Boolean, default: true }) resizable?: boolean
   @Prop({ type: Boolean, default: false }) minimized?: boolean
   @Prop({ type: Boolean, default: true }) value?: boolean
+  @Prop({ type: Boolean, default: true }) center?: boolean
   @Prop({ type: Number }) x?: number
   @Prop({ type: Number }) y?: number
   @Prop({ type: Number }) width?: number
@@ -195,8 +196,8 @@ export default class Window extends Vue {
   offset = { x: 0, y: 0 }
   current = {
     value: this.value,
-    x: this.x,
-    y: this.y,
+    x: this.x || 0,
+    y: this.y || 0,
     width: this.width,
     height: this.height,
     focused: this.focused
@@ -230,6 +231,10 @@ export default class Window extends Vue {
     this.$emit('update:y', this.current.y)
   }
 
+  private normalizeValue(value: number, min: number, max: number) {
+    return Math.min(Math.max(value, min), max)
+  }
+
   private handleMouseDown(x: number, y: number) {
     const window = this.$refs.window as HTMLDivElement
 
@@ -245,9 +250,17 @@ export default class Window extends Vue {
   }
 
   get computedStyle() {
+    const el = this.$el as HTMLDivElement
+    const parentEl = this.$parent.$el as HTMLDivElement
+    const titlebar = this.$refs.titleBar as HTMLDivElement
+    const maxX = (parentEl && parentEl.offsetWidth - 16) || Infinity
+    const maxY =
+      (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
+    const minX = (titlebar && 16 - titlebar.offsetWidth) || -Infinity
+    const minY = 0
     return {
-      top: `${this.current.y}px`,
-      left: `${this.current.x}px`
+      top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
+      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`
     }
   }
 
@@ -273,7 +286,16 @@ export default class Window extends Vue {
 
   mounted() {
     const $el = this.$el as HTMLDivElement
-    this.$parent.$el.addEventListener('pointerdown', this.handleBlur.bind(this))
+    const $parentEl = this.$parent.$el as HTMLDivElement
+
+    $parentEl.addEventListener('pointerdown', this.handleBlur.bind(this))
+    if (this.center && !this.x && !this.y) {
+      this.current = {
+        ...this.current,
+        x: $parentEl.offsetWidth / 2 - $el.offsetWidth / 2,
+        y: $parentEl.offsetHeight / 2 - $el.offsetHeight / 2
+      }
+    }
   }
 }
 </script>

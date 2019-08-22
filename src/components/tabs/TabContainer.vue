@@ -7,7 +7,6 @@
 <style lang="stylus">
 .px-tab-container {
   display: block;
-  width: 100%;
   border: 1px solid #000;
   background: #ffffff;
   position: relative;

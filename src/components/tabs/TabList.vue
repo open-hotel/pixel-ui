@@ -7,6 +7,7 @@
 <style lang="stylus">
 .px-tab-list {
   display: flex;
+  flex-wrap: wrap;
   list-style: none;
   font: 11px Volter, Roboto, Arial, sans-serif;
   margin: 0;

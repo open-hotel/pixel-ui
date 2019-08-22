@@ -1,12 +1,7 @@
 <template>
   <div class="demo-windows">
     <px-window-manager class="windows-ui">
-      <px-window minimizable>
-        <h3>Lorem, ipsum dolor.</h3>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi eum,
-          qui ad aut facilis repellat nobis molestiae tenetur. Iusto, porro!
-        </p>
+      <px-window center :width="400" :height="400">
         <px-tab-list>
           <px-tab-list-item v-model="tab" target="home"
             >Início</px-tab-list-item
@@ -43,6 +38,10 @@
         </px-tab-container>
         <template #footer>
           <px-btn>Default</px-btn>
+          <px-btn color="success">Success</px-btn>
+          <px-btn color="info">Info</px-btn>
+          <px-btn color="warning">Warning</px-btn>
+          <px-btn color="danger">Danger</px-btn>
         </template>
       </px-window>
     </px-window-manager>
