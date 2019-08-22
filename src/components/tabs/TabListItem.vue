@@ -15,13 +15,14 @@
   background: rgba(#FFF, 50%);
   border: 1px solid #000;
   border-bottom: 0;
-  padding: 0.25em 0.5em;
+  padding: 0.4em .8em;
   border-radius: 0.5em 0.5em 0 0;
   cursor: pointer;
   color: #000;
 
   &--active {
     background: #FFF;
+    margin-bottom: -1px;
   }
 }
 </style>

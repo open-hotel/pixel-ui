@@ -1,13 +1,16 @@
 <template>
-  <div class="px-tab-view" v-if="active || value === name" :key="name">
+  <div class="px-tab-container" v-if="active || value === name" :key="name">
     <slot />
   </div>
 </template>
 
 <style lang="stylus">
-.px-tab-view {
+.px-tab-container {
   display: block;
   width: 100%;
+  border: 1px solid #000;
+  background: #ffffff;
+  position: relative;
 }
 </style>
 

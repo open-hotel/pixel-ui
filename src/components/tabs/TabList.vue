@@ -9,5 +9,8 @@
   display: flex;
   list-style: none;
   font: 11px Volter, Roboto, Arial, sans-serif;
+  margin: 0;
+  z-index: 1;
+  position: relative;
 }
 </style>

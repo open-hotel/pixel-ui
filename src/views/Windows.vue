@@ -24,7 +24,7 @@
             >Buscar</px-tab-list-item
           >
         </px-tab-list>
-        <div>
+        <px-tab-container>
           <px-tab-view v-model="tab" name="home">
             <h1>Home</h1>
           </px-tab-view>
@@ -40,7 +40,7 @@
           <px-tab-view v-model="tab" name="search">
             <h1>Busca</h1>
           </px-tab-view>
-        </div>
+        </px-tab-container>
         <template #footer>
           <px-btn>Default</px-btn>
         </template>
@@ -63,7 +63,7 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class Home extends Vue {
   data() {
     return {
-      tab: '',
+      tab: 'home',
       position: {
         x: 50,
         y: 150,
