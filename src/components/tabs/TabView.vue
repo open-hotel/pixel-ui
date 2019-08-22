@@ -7,7 +7,7 @@
 <style lang="stylus">
 .px-tab-view {
   display: block;
-  width: 100%;
+  padding: 1em;
 }
 </style>
 

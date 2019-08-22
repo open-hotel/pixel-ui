@@ -1,5 +1,5 @@
 <template>
-  <button :class="['px-btn', `px-btn-${color}`]">
+  <button :class="['px-btn', `px-btn-${color}`]" v-on="$listeners">
     <div class="px-btn-content">
       <slot />
     </div>

@@ -1,32 +1,17 @@
 <template>
-  <div class="px-tab-container" v-if="active || value === name" :key="name">
+  <div class="px-tab-container">
     <slot />
   </div>
 </template>
 
 <style lang="stylus">
 .px-tab-container {
+  flex: 1;
   display: block;
   border: 1px solid #000;
   background: #ffffff;
   position: relative;
+  overflow-y: auto;
+  height: 100%;
 }
 </style>
-
-<script>
-export default {
-  props: {
-    active: {
-      type: Boolean,
-      default: false
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    value: {
-      type: String
-    }
-  }
-}
-</script>

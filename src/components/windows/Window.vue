@@ -1,7 +1,7 @@
 <template>
   <transition name="popup">
     <div
-      v-if="current.value"
+      v-if="visible"
       :class="[
         'window',
         { 'window--focused': current.focused, 'window--resizable': resizable }
@@ -9,7 +9,7 @@
       tabindex="-1"
       :style="computedStyle"
       ref="window"
-      @mousedown="current.focused = true"
+      @pointerdown="current.focused = true"
     >
       <template v-if="titlebar">
         <slot name="titleBar" v-if="$slots.titleBar" />
@@ -17,7 +17,7 @@
           v-else
           class="window-title"
           ref="titleBar"
-          @mousedown.prevent="handleMouseDown($event.clientX, $event.clientY)"
+          @pointerdown.prevent="handleMouseDown($event.clientX, $event.clientY)"
         >
           <slot name="title" v-if="$slots.title" />
           <span v-else-if="title" class="window-title-text">{{ title }}</span>
@@ -36,7 +36,7 @@
           </div>
         </div>
       </template>
-      <div class="window-content" :style="computedContentStyle">
+      <div class="window-content">
         <div class="window-content-body">
           <slot />
         </div>
@@ -44,23 +44,30 @@
           <slot name="footer" />
         </div>
       </div>
+      <div
+        v-if="resizable"
+        class="window-resizer"
+        ref="resizeButton"
+        @pointerdown="handleClickResize"
+      ></div>
     </div>
   </transition>
 </template>
 
 <style lang="stylus">
 .window {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   background: #E0E0E0;
   color: #333;
   border-radius: 8px;
-  overflow: hidden;
   border: 1px solid #000;
   box-shadow: 0 0 0 rgba(#000, 0.82);
   font-size: 14px;
   max-width: 100%;
   outline: none;
-  transition: all 0.21s ease, top, left, width, height 0s;
+  transition: box-shadow 0.21s ease;
   font: 13px Roboto, Arial, sans-serif;
 
   &-title {
@@ -70,7 +77,7 @@
     align-items: center;
     background: #568ba4;
     padding: 0.5em;
-    border: 2px double #69a6c3;
+    border: 2px double rgba(#FFF, 25%);
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: default;
@@ -83,25 +90,30 @@
   }
 
   &-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
     overflow: auto;
     position: relative;
-    padding: 1em;
-    min-width: 128px;
-    min-height: 128px;
 
     &-body {
       flex: 1;
+      height: 100%;
+      display: flex;
+      flex-flow: column;
     }
   }
 
-  &--resizable {
-    p(selector());
-
-    ^[0]-content {
-      resize: both;
-    }
+  &-resizer {
+    display: block;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    bottom: 0;
+    right: 0;
+    cursor: nwse-resize;
+    z-index: 1;
+    user-select: none;
   }
 
   &--focused {
@@ -147,20 +159,19 @@
   &-footer {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: center;
-    padding: 0.25em 0.5em;
   }
 }
 
 .popup {
   &-enter-active, &-leave-active {
-    transform: scale(1);
-    opacity: 1;
+    transition: all .4s cubic-bezier(.75,-0.5,0,1.75);
   }
 
   &-enter, &-leave-to {
-    transform: scale(0.95);
+    transform: scale(0.8);
     opacity: 0;
   }
 }
@@ -169,38 +180,70 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { Prop, Watch } from 'vue-property-decorator'
+import { Prop, Watch, Model } from 'vue-property-decorator'
 
 @Component
 export default class Window extends Vue {
   // Props
-  @Prop({ type: Boolean, default: true }) focused?: boolean
-  @Prop({ type: Boolean, default: true }) titlebar?: boolean
-  @Prop({ type: Boolean, default: true }) closeable?: boolean
-  @Prop({ type: Boolean, default: false }) minimizable?: boolean
-  @Prop({ type: Boolean, default: true }) resizable?: boolean
-  @Prop({ type: Boolean, default: false }) minimized?: boolean
-  @Prop({ type: Boolean, default: true }) value?: boolean
-  @Prop({ type: Boolean, default: true }) center?: boolean
-  @Prop({ type: Number }) x?: number
-  @Prop({ type: Number }) y?: number
-  @Prop({ type: Number }) width?: number
-  @Prop({ type: Number }) height?: number
-  @Prop({ type: String, default: 'Message' }) title?: string
+  @Prop({ type: Boolean, default: true }) visible!: boolean
+  @Prop({ type: Boolean, default: true }) focused!: boolean
+  @Prop({ type: Boolean, default: true }) titlebar!: boolean
+  @Prop({ type: Boolean, default: true }) closeable!: boolean
+  @Prop({ type: Boolean, default: false }) minimizable!: boolean
+  @Prop({ type: Boolean, default: false }) resizable!: boolean
+  @Prop({ type: Boolean, default: false }) minimized!: boolean
+  @Prop({ type: Boolean, default: false }) closed!: boolean
+  @Prop({ type: Boolean, default: true }) center!: boolean
+  @Prop({ type: Number }) x!: number
+  @Prop({ type: Number }) y!: number
+  @Prop({ type: Number }) width!: number
+  @Prop({ type: Number }) height!: number
+  @Prop({ type: Number, default: 128 }) minWidth!: number
+  @Prop({ type: Number, default: 128 }) minHeight!: number
+  @Prop({ type: Number, default: 800 }) maxWidth!: number
+  @Prop({ type: Number, default: 600 }) maxHeight!: number
+  @Prop({ type: String, default: 'Message' }) title!: string
+
+  @Watch('focused')
+  private setFocused(focused: boolean) {
+    this.current.focused = focused
+  }
 
   @Watch('value')
   private setVisibility(visible: boolean) {
-    this.current.value = visible
+    this.current.visible = visible
+  }
+
+  @Watch('width')
+  private setWidth(width: number) {
+    this.current.width = width
+  }
+
+  @Watch('height')
+  private setHeight(height: number) {
+    this.current.height = height
+  }
+
+  @Watch('x')
+  private setPositionX(x: number) {
+    this.current.x = x
+  }
+
+  @Watch('y')
+  private setPositionY(y: number) {
+    this.current.y = y
   }
 
   offset = { x: 0, y: 0 }
   current = {
-    value: this.value,
+    visible: this.visible,
     x: this.x || 0,
     y: this.y || 0,
-    width: this.width,
-    height: this.height,
-    focused: this.focused
+    width: this.width || 320,
+    height: this.height || 240,
+    focused: !!this.focused,
+    minimized: this.minimized,
+    closed: this.closed
   }
 
   private handleBlur(e: any) {
@@ -215,6 +258,7 @@ export default class Window extends Vue {
 
     this.$parent.$el.removeEventListener('pointerup', this.handleStopDrag)
     this.$parent.$el.removeEventListener('pointermove', this.handleMove)
+    this.$parent.$el.removeEventListener('pointermove', this.handleLeaveResize)
   }
 
   private handleMove(e: Event) {
@@ -229,6 +273,43 @@ export default class Window extends Vue {
     this.$emit('move', this.current)
     this.$emit('update:x', this.current.x)
     this.$emit('update:y', this.current.y)
+  }
+
+  private handleResize(e: Event) {
+    const { clientX, clientY } = e as PointerEvent
+    const $el = e.target as any
+    const width = clientX - this.current.x
+    const height = clientY - this.current.y
+    this.current = {
+      ...this.current,
+      width: this.normalizeValue(width, this.minWidth, this.maxWidth),
+      height: this.normalizeValue(height, this.minHeight, this.maxHeight)
+    }
+
+    this.$emit('resize', {
+      width: this.current.width,
+      height: this.current.height
+    })
+
+    this.$emit('update:width', this.current.width)
+    this.$emit('update:height', this.current.height)
+  }
+
+  private handleClickResize(e: Event) {
+    const $parent = this.$parent.$el as HTMLDivElement
+    $parent.addEventListener('pointermove', this.handleResize)
+    $parent.addEventListener(
+      'pointerup',
+      () => {
+        $parent.removeEventListener('pointermove', this.handleResize)
+      },
+      { once: true }
+    )
+  }
+
+  private handleLeaveResize(e: Event) {
+    const $parent = this.$parent.$el as HTMLDivElement
+    $parent.removeEventListener('pointermove', this.handleResize)
   }
 
   private normalizeValue(value: number, min: number, max: number) {
@@ -258,37 +339,43 @@ export default class Window extends Vue {
       (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
     const minX = (titlebar && 16 - titlebar.offsetWidth) || -Infinity
     const minY = 0
+    const maxWidth = (parentEl && parentEl.offsetWidth) || Infinity
+    const maxHeight = (parentEl && parentEl.offsetHeight) || Infinity
+
     return {
       top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
-      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`
-    }
-  }
-
-  get computedContentStyle() {
-    return {
-      width: `${this.current.width}px`,
-      height: `${this.current.height}px`
+      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`,
+      width: `${this.normalizeValue(this.current.width, 128, maxWidth)}px`,
+      height: `${this.normalizeValue(this.current.height, 128, maxHeight)}px`
     }
   }
 
   close() {
-    this.current.value = false
-    this.$emit('input', this.current.value)
+    this.current.visible = false
+    this.current.closed = true
+
+    this.$emit('input', false)
+    this.$emit('update:closed', true)
+    this.$emit('update:visible', this.current.visible)
     this.$emit('close')
   }
 
   minimize() {
-    this.current.value = false
+    this.current.visible = false
+    this.current.minimized = true
 
-    this.$emit('input', this.current.value)
+    this.$emit('input', this.current.visible)
     this.$emit('update:minimized', true)
+    this.$emit('update:visible', this.current.visible)
   }
 
   mounted() {
     const $el = this.$el as HTMLDivElement
     const $parentEl = this.$parent.$el as HTMLDivElement
+    const $resize = this.$refs.resizeButton as HTMLDivElement
 
     $parentEl.addEventListener('pointerdown', this.handleBlur.bind(this))
+
     if (this.center && !this.x && !this.y) {
       this.current = {
         ...this.current,

@@ -1,33 +1,89 @@
 <template>
   <div class="demo-windows">
+    <px-btn @click="window.visible = !window.visible">Toggle</px-btn>
     <px-window-manager class="windows-ui">
-      <px-window center :width="400" :height="400">
+      <px-window v-bind.sync="window">
         <px-tab-list>
-          <px-tab-list-item v-model="tab" target="home"
-            >Início</px-tab-list-item
+          <px-tab-list-item v-model="tab" target="stats"
+            >Window Status</px-tab-list-item
           >
-          <px-tab-list-item v-model="tab" target="rooms"
-            >Quartos</px-tab-list-item
-          >
-          <px-tab-list-item v-model="tab" target="events"
-            >Eventos</px-tab-list-item
-          >
-          <px-tab-list-item v-model="tab" target="me"
-            >Meu Mundo</px-tab-list-item
-          >
-          <px-tab-list-item v-model="tab" target="search"
-            >Buscar</px-tab-list-item
+          <px-tab-list-item v-model="tab" target="buttons"
+            >Buttons</px-tab-list-item
           >
         </px-tab-list>
         <px-tab-container>
-          <px-tab-view v-model="tab" name="home">
-            <h1>Home</h1>
+          <px-tab-view v-model="tab" name="stats">
+            <table>
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(value, key) in window" :key="key">
+                  <td>{{ key }}</td>
+                  <td class="center">
+                    <input
+                      v-if="typeof value === 'string'"
+                      v-model="window[key]"
+                    />
+                    <input
+                      v-else-if="typeof value === 'number'"
+                      type="number"
+                      v-model.number="window[key]"
+                    />
+                    <input
+                      v-else-if="typeof value === 'boolean'"
+                      type="checkbox"
+                      v-model="window[key]"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </px-tab-view>
-          <px-tab-view v-model="tab" name="rooms">
-            <h1>Quartos</h1>
-          </px-tab-view>
-          <px-tab-view v-model="tab" name="events">
-            <h1>Eventos</h1>
+          <px-tab-view v-model="tab" name="buttons">
+            <table>
+              <thead>
+                <tr>
+                  <th>Context</th>
+                  <th>Button</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Default</td>
+                  <td class="center">
+                    <px-btn>Button</px-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Success</td>
+                  <td class="center">
+                    <px-btn color="success">Button</px-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Info</td>
+                  <td class="center">
+                    <px-btn color="info">Button</px-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Warning</td>
+                  <td class="center">
+                    <px-btn color="warning">Button</px-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Danger</td>
+                  <td class="center">
+                    <px-btn color="danger">Button</px-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </px-tab-view>
           <px-tab-view v-model="tab" name="me">
             <h1>Meus</h1>
@@ -36,13 +92,7 @@
             <h1>Busca</h1>
           </px-tab-view>
         </px-tab-container>
-        <template #footer>
-          <px-btn>Default</px-btn>
-          <px-btn color="success">Success</px-btn>
-          <px-btn color="info">Info</px-btn>
-          <px-btn color="warning">Warning</px-btn>
-          <px-btn color="danger">Danger</px-btn>
-        </template>
+        <template #footer></template>
       </px-window>
     </px-window-manager>
   </div>
@@ -53,6 +103,14 @@
   width: 100vw;
   height: 100vh;
 }
+
+.center {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+}
 </style>
 
 <script lang="ts">
@@ -62,12 +120,14 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class Home extends Vue {
   data() {
     return {
-      tab: 'home',
-      position: {
-        x: 50,
-        y: 150,
-        width: 128,
-        height: 128
+      tab: 'stats',
+      window: {
+        visible: true,
+        resizable: true,
+        x: 480,
+        y: 128,
+        width: 320,
+        height: 240
       }
     }
   }
