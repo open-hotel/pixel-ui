@@ -136,12 +136,19 @@ export default class Home extends Vue {
       tab: 'stats',
       window: {
         visible: true,
+        titlebar: true,
         resizable: true,
-        center: false,
+        center: true,
+        minimizable: true,
+        closeable: true,
         x: 0,
         y: 0,
-        width: 320,
-        height: 240
+        width: null,
+        height: null,
+        minWidth: 128,
+        minHeight: 128,
+        maxWidth: 800,
+        maxHeight: 600
       }
     }
   }

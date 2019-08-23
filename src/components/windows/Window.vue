@@ -24,7 +24,7 @@
           <slot name="windowActions" v-if="$slots.windowActions" />
           <div class="window-actions">
             <button
-              v-if="closeable"
+              v-if="minimizable"
               class="window-action window-action-minimize"
               @click="minimize"
             ></button>
@@ -69,17 +69,20 @@
   transition: box-shadow 0.21s ease;
   font: 13px Roboto, Arial, sans-serif;
   background: #568ba4;
+  overflow: hidden;
 
   &-title {
     flex: 0 auto;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0.5em;
+    padding: 0.25em;
+    min-height: 24px;
     border: 2px double #69a6c3;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: default;
+    position: relative;
 
     &-text {
       flex: 1;
@@ -118,6 +121,12 @@
   &--focused {
     box-shadow: 0 4px 8px rgba(#000, 0.82), 0 4px 0 rgba(#000, 0.82);
     z-index: 99999999;
+  }
+
+  &-actions {
+    position: absolute;
+    right: .3em;
+    top: .3em;
   }
 
   &-action {
@@ -166,7 +175,7 @@
 
 .popup {
   &-enter-active, &-leave-active {
-    transition: all .4s cubic-bezier(.75,-0.5,0,1.75);
+    transition: all 0.4s cubic-bezier(0.75, -0.5, 0, 1.75);
   }
 
   &-enter, &-leave-to {
@@ -221,6 +230,40 @@ export default class Window extends Vue {
   @Watch('height')
   private setHeight(height: number) {
     this.current.height = height
+  }
+  @Watch('maxHeight')
+  private setMaxHeight(maxHeight: number) {
+    this.current.height = this.normalizeValue(
+      this.current.height,
+      this.minHeight,
+      maxHeight
+    )
+  }
+
+  @Watch('maxWidth')
+  private setMaxWidth(maxWidth: number) {
+    this.current.width = this.normalizeValue(
+      this.current.width,
+      this.maxWidth,
+      maxWidth
+    )
+  }
+  @Watch('minHeight')
+  private setMinHeight(minHeight: number) {
+    this.current.height = this.normalizeValue(
+      this.current.height,
+      minHeight,
+      this.maxHeight
+    )
+  }
+
+  @Watch('minWidth')
+  private setMinWidth(minWidth: number) {
+    this.current.width = this.normalizeValue(
+      this.current.width,
+      minWidth,
+      this.maxWidth
+    )
   }
 
   @Watch('x')
@@ -284,9 +327,6 @@ export default class Window extends Vue {
     const y = pageY - $parent.offsetTop
     const width = x - this.current.x
     const height = y - this.current.y
-
-    console.log($el.offsetTop, $el.offsetLeft, width, height)
-
     this.current = {
       ...this.current,
       width: this.normalizeValue(width, this.minWidth, this.maxWidth),
@@ -359,9 +399,8 @@ export default class Window extends Vue {
 
   close() {
     this.current.visible = false
-    this.current.closed = true
     this.$emit('change', false)
-    this.$emit('update:closed', true)
+    this.$emit('update:visible', false)
     this.$emit('close')
   }
 
@@ -371,6 +410,7 @@ export default class Window extends Vue {
 
     this.$emit('input', this.current.visible)
     this.$emit('update:minimized', true)
+    this.$emit('update:visible', false)
   }
 
   mounted() {
