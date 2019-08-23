@@ -1,6 +1,8 @@
 <template>
   <div class="demo-windows">
-    <px-btn @click="window.visible = !window.visible">Toggle</px-btn>
+    <px-btn color="success" @click="window.visible = true">Show</px-btn>
+    <br />
+    <px-btn color="danger" @click="window.visible = false">Hide</px-btn>
     <px-window-manager class="windows-ui">
       <px-window v-bind.sync="window">
         <px-tab-list>
@@ -100,8 +102,10 @@
 
 <style lang="stylus">
 .windows-ui {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border: 1px solid red;
 }
 
 .center {
@@ -124,8 +128,9 @@ export default class Home extends Vue {
       window: {
         visible: true,
         resizable: true,
-        x: 480,
-        y: 128,
+        center: false,
+        x: 0,
+        y: 0,
         width: 320,
         height: 240
       }

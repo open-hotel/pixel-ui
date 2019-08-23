@@ -17,7 +17,7 @@
           v-else
           class="window-title"
           ref="titleBar"
-          @pointerdown.prevent="handleMouseDown($event.clientX, $event.clientY)"
+          @pointerdown.prevent="handleMouseDown($event.pageX, $event.pageY)"
         >
           <slot name="title" v-if="$slots.title" />
           <span v-else-if="title" class="window-title-text">{{ title }}</span>
@@ -59,7 +59,6 @@
   display: flex;
   flex-direction: column;
   position: absolute;
-  background: #E0E0E0;
   color: #333;
   border-radius: 8px;
   border: 1px solid #000;
@@ -77,7 +76,7 @@
     flex-direction: row;
     align-items: center;
     padding: 0.5em;
-    border: 2px double rgba(#FFF, 25%);
+    border: 2px double #69a6c3;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: default;
@@ -185,7 +184,7 @@ import { Prop, Watch, Model } from 'vue-property-decorator'
 @Component
 export default class Window extends Vue {
   // Props
-  @Prop({ type: Boolean, default: true }) visible!: boolean
+  @Model('change', { type: Boolean, default: true }) visible!: boolean
   @Prop({ type: Boolean, default: true }) focused!: boolean
   @Prop({ type: Boolean, default: true }) titlebar!: boolean
   @Prop({ type: Boolean, default: true }) closeable!: boolean
@@ -198,10 +197,10 @@ export default class Window extends Vue {
   @Prop({ type: Number }) y!: number
   @Prop({ type: Number }) width!: number
   @Prop({ type: Number }) height!: number
-  @Prop({ type: Number, default: 38 }) minWidth!: number
-  @Prop({ type: Number, default: 38 }) minHeight!: number
+  @Prop({ type: Number, default: 128 }) minWidth!: number
+  @Prop({ type: Number, default: 128 }) minHeight!: number
   @Prop({ type: Number, default: 800 }) maxWidth!: number
-  @Prop({ type: Number, default: 400 }) maxHeight!: number
+  @Prop({ type: Number, default: 600 }) maxHeight!: number
   @Prop({ type: String, default: 'Message' }) title!: string
 
   @Watch('focused')
@@ -253,7 +252,6 @@ export default class Window extends Vue {
   }
 
   private handleStopDrag(e: Event) {
-    const { clientX, clientY } = e as PointerEvent
     const $el = e.target as any
 
     this.$parent.$el.removeEventListener('pointerup', this.handleStopDrag)
@@ -262,12 +260,12 @@ export default class Window extends Vue {
   }
 
   private handleMove(e: Event) {
-    const { clientX, clientY } = e as PointerEvent
+    const { pageX: x, pageY: y } = e as PointerEvent
 
     this.current = {
       ...this.current,
-      x: this.offset.x + clientX,
-      y: this.offset.y + clientY
+      x: this.offset.x + x,
+      y: this.offset.y + y
     }
 
     this.$emit('move', this.current)
@@ -276,19 +274,32 @@ export default class Window extends Vue {
   }
 
   private handleResize(e: Event) {
-    const { clientX, clientY } = e as PointerEvent
-    const $el = e.target as HTMLDivElement
-    const width = clientX - this.current.x
-    const height = clientY - (this.current.y + 38)
+    e.stopPropagation()
+    e.preventDefault()
+
+    const { pageX, pageY } = e as PointerEvent
+    const $el = this.$el as any
+    const $parent = this.$parent.$el as any
+    const x = pageX - $parent.offsetLeft
+    const y = pageY - $parent.offsetTop
+    const width = x - this.current.x
+    const height = y - this.current.y
+
+    console.log($el.offsetTop, $el.offsetLeft, width, height)
+
     this.current = {
       ...this.current,
       width: this.normalizeValue(width, this.minWidth, this.maxWidth),
       height: this.normalizeValue(height, this.minHeight, this.maxHeight)
     }
 
-    this.$emit('resize', this.current)
-    this.$emit('update:width', this.current.width)
-    this.$emit('update:height', this.current.height)
+    // this.$emit('resize', {
+    //   width: this.current.width,
+    //   height: this.current.height
+    // })
+
+    // this.$emit('update:width', this.current.width)
+    // this.$emit('update:height', this.current.height)
   }
 
   private handleClickResize(e: Event) {
@@ -335,23 +346,22 @@ export default class Window extends Vue {
       (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
     const minX = (titlebar && 16 - titlebar.offsetWidth) || -Infinity
     const minY = 0
-    const { x, y, width, height } = this.current
+    const maxWidth = (parentEl && parentEl.offsetWidth) || Infinity
+    const maxHeight = (parentEl && parentEl.offsetHeight) || Infinity
 
     return {
-      top: `${this.normalizeValue(y, minY, maxY)}px`,
-      left: `${this.normalizeValue(x, minX, maxX)}px`,
-      width: `${this.normalizeValue(width, this.minWidth, this.maxWidth)}px`,
-      height: `${this.normalizeValue(height, this.minHeight, this.maxHeight)}px`
+      top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
+      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`,
+      width: `${this.normalizeValue(this.current.width, 128, maxWidth)}px`,
+      height: `${this.normalizeValue(this.current.height, 128, maxHeight)}px`
     }
   }
 
   close() {
     this.current.visible = false
     this.current.closed = true
-
-    this.$emit('input', false)
+    this.$emit('change', false)
     this.$emit('update:closed', true)
-    this.$emit('update:visible', this.current.visible)
     this.$emit('close')
   }
 
@@ -361,7 +371,6 @@ export default class Window extends Vue {
 
     this.$emit('input', this.current.visible)
     this.$emit('update:minimized', true)
-    this.$emit('update:visible', this.current.visible)
   }
 
   mounted() {
