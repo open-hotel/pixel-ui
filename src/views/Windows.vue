@@ -1,8 +1,11 @@
 <template>
   <div class="demo-windows">
-    <px-btn color="success" @click="window.visible = true">Show</px-btn>
-    <br />
-    <px-btn color="danger" @click="window.visible = false">Hide</px-btn>
+    <px-btn
+      class="btn-toggle"
+      color="danger"
+      @click="window.visible = !window.visible"
+      >Toggle</px-btn
+    >
     <px-window-manager class="windows-ui">
       <px-window v-bind.sync="window">
         <px-tab-list>
@@ -105,7 +108,6 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  border: 1px solid red;
 }
 
 .center {
@@ -114,6 +116,13 @@
 
 table {
   width: 100%;
+}
+
+.btn-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index 99999999999
 }
 </style>
 
