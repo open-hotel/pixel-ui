@@ -9,7 +9,10 @@
       tabindex="-1"
       :style="computedStyle"
       ref="window"
+      @touchmove.prevent="canMove ? handleMove($event.touches[0]) : null"
       @pointerdown="current.focused = true"
+      @pointermove="canMove && handleMove"
+      @touchend="canMove = false"
     >
       <template v-if="titlebar">
         <slot name="titleBar" v-if="$slots.titleBar" />
@@ -17,7 +20,7 @@
           v-else
           class="window-title"
           ref="titleBar"
-          @pointerdown.prevent="handleMouseDown($event.pageX, $event.pageY)"
+          @pointerdown="handleMouseDown($event.pageX, $event.pageY)"
         >
           <slot name="title" v-if="$slots.title" />
           <span v-else-if="title" class="window-title-text">{{ title }}</span>
@@ -125,8 +128,8 @@
 
   &-actions {
     position: absolute;
-    right: .3em;
-    top: .3em;
+    right: 0.3em;
+    top: 0.3em;
   }
 
   &-action {
@@ -276,6 +279,8 @@ export default class Window extends Vue {
     this.current.y = y
   }
 
+  // Data
+  canMove: boolean = false
   offset = { x: 0, y: 0 }
   current = {
     visible: this.visible,
@@ -295,6 +300,7 @@ export default class Window extends Vue {
   }
 
   private handleStopDrag(e: Event) {
+    this.canMove = false
     const $el = e.target as any
 
     this.$parent.$el.removeEventListener('pointerup', this.handleStopDrag)
@@ -372,6 +378,8 @@ export default class Window extends Vue {
       x: window.offsetLeft - x,
       y: window.offsetTop - y
     }
+
+    this.canMove = true
 
     this.$parent.$el.addEventListener('pointerup', this.handleStopDrag)
     this.$parent.$el.addEventListener('pointermove', this.handleMove)
