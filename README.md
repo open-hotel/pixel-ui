@@ -1,29 +1,6 @@
-# open-hotel
+# Pixel UI
 
-## Project setup
-```
-yarn install
-```
+Pixel UI is a Vue.js based lib that implements Habbo UI components.
+It is being designed for [Open Hotel](https://github.com/open-hotel/open-hotel-client)
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
-
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+It is still an on-going project, so contributions are more than welcomed!
