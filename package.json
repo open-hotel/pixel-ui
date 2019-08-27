@@ -7,8 +7,7 @@
     "build": "vue-cli-service build",
     "build:lib": "vue-cli-service build --target lib --name pixel ./src/index.ts",
     "lint": "vue-cli-service lint",
-    "pre-release": "yarn build",
-    "release": "release-it"
+    "release": "yarn build && release-it"
   },
   "files": [
     "fonts",
