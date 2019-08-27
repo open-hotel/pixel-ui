@@ -6,9 +6,14 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:lib": "vue-cli-service build --target lib --name pixel ./src/index.ts",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "pre-release": "yarn build",
+    "release": "release-it"
   },
-  "files": ["fonts"],
+  "files": [
+    "fonts",
+    "dist"
+  ],
   "dependencies": {
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.10",
@@ -30,6 +35,7 @@
     "eslint-plugin-vue": "^5.0.0",
     "lint-staged": "^8.1.5",
     "prettier": "^1.18.2",
+    "release-it": "^12.3.5",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "typescript": "^3.4.3",
