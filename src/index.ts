@@ -1,5 +1,5 @@
 import './stylus/main.styl'
-import { VueConstructor } from 'vue'
+import { PluginFunction } from 'vue'
 import {
   WindowManager,
   Window,
@@ -10,7 +10,9 @@ import {
   TabContainer
 } from './components'
 
-export const PixelUI = (Vue: VueConstructor) => {
+export * from './components'
+
+export const PixelUI: PluginFunction<void> = Vue => {
   Vue.component('px-btn', Button)
 
   Vue.component('px-window-manager', WindowManager)

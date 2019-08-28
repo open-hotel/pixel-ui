@@ -8,6 +8,8 @@ module.exports = {
     })
   },
   chainWebpack: config => {
+    config.module.rule('ts').uses.delete('cache-loader')
+    config.module.rule('tsx').uses.delete('cache-loader')
     config.module
       .rule('ts')
       .use('ts-loader')

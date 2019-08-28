@@ -12,6 +12,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationDir": "dist/types",
+    "declarationMap": true,
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
