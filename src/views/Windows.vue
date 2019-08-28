@@ -104,6 +104,10 @@
 </template>
 
 <style lang="stylus">
+.demo-windows {
+  height: 100vh;
+}
+
 .windows-ui {
   width: 100%;
   height: 100%;
@@ -122,7 +126,7 @@ table {
   position: absolute;
   top: 0;
   left: 0;
-  z-index 99999999999
+  z-index: 99999999999;
 }
 </style>
 
