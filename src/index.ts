@@ -1,5 +1,5 @@
 import './stylus/main.styl'
-import { PluginFunction } from 'vue'
+import VueModule from 'vue'
 import {
   WindowManager,
   Window,
@@ -12,14 +12,16 @@ import {
 
 export * from './components'
 
-export const PixelUI: PluginFunction<void> = Vue => {
-  Vue.component('px-btn', Button)
+export default class PixelUI {
+  static install(Vue: typeof VueModule) {
+    Vue.component('px-btn', Button)
 
-  Vue.component('px-window-manager', WindowManager)
-  Vue.component('px-window', Window)
+    Vue.component('px-window-manager', WindowManager)
+    Vue.component('px-window', Window)
 
-  Vue.component('px-tab-list', TabList)
-  Vue.component('px-tab-list-item', TabListItem)
-  Vue.component('px-tab-view', TabView)
-  Vue.component('px-tab-container', TabContainer)
+    Vue.component('px-tab-list', TabList)
+    Vue.component('px-tab-list-item', TabListItem)
+    Vue.component('px-tab-view', TabView)
+    Vue.component('px-tab-container', TabContainer)
+  }
 }

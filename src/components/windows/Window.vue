@@ -80,7 +80,7 @@
     flex-direction: row;
     align-items: center;
     padding: 0.25em;
-    min-height: 24px;
+    min-height: 32px;
     border: 2px double #69a6c3;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
@@ -251,6 +251,7 @@ export default class Window extends Vue {
       maxWidth
     )
   }
+
   @Watch('minHeight')
   private setMinHeight(minHeight: number) {
     this.current.height = this.normalizeValue(
@@ -338,14 +339,6 @@ export default class Window extends Vue {
       width: this.normalizeValue(width, this.minWidth, this.maxWidth),
       height: this.normalizeValue(height, this.minHeight, this.maxHeight)
     }
-
-    // this.$emit('resize', {
-    //   width: this.current.width,
-    //   height: this.current.height
-    // })
-
-    // this.$emit('update:width', this.current.width)
-    // this.$emit('update:height', this.current.height)
   }
 
   private handleClickResize(e: Event) {
@@ -388,7 +381,9 @@ export default class Window extends Vue {
   get computedStyle() {
     const el = this.$el as HTMLDivElement
     const parentEl = this.$parent.$el as HTMLDivElement
-    const titlebar = this.$refs.titleBar as HTMLDivElement
+    const titlebar = (this.$refs.titleBar as HTMLDivElement) || {
+      offsetHeight: 0
+    }
     const maxX = (parentEl && parentEl.offsetWidth - 16) || Infinity
     const maxY =
       (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
