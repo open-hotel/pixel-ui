@@ -9,21 +9,21 @@
 <style lang="stylus">
 @require '../../stylus/theme';
 
-$shadow = 25%;
+$shadow = 15%;
 $shadowPressed = 50%;
 
 .px-btn {
   display: inline-block;
-  padding: 0.5em 1em;
-  font: 14px Roboto, Arial;
-  border-radius: 0.25em;
-  border: 2px solid #000;
+  padding: 4px 16px;
+  font: 12px Roboto, Arial;
+  border-radius: 2px;
+  border: 1px solid #000;
   outline: none;
-  box-shadow: 0 2px 0 rgba(#000, 82%);
   cursor: pointer;
-  transition: all 0.21s ease;
   position: relative;
   margin: 2px;
+  font-weight: bold;
+  box-shadow: 0 1px 0 #000;
 
   &:before {
     content: '';
@@ -48,6 +48,7 @@ $shadowPressed = 50%;
 
   for $name, $color in $theme {
     $bgColor = darken($color, $shadow);
+
     &-{$name} {
       background: $bgColor;
       color: contrast($color, #000).ratio > 8 ? #000 : #FFF;

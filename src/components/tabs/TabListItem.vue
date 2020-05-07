@@ -17,29 +17,28 @@
   display: flex;
   flex: 1;
   background: rgba(#FFF, 50%);
+  border-bottom: 0;
   border: 1px solid #000;
   border-bottom: 0;
   padding: 0.4em 0.8em;
-  border-radius: 0.5em 0.5em 0 0;
   cursor: pointer;
   color: #000;
   text-align: center;
   align-items: center;
   justify-content: center;
   position: relative;
+  border-radius: 4px 4px 0 0;
+
+  & + &, &:first-child {
+    border-left: 0;
+  }
+
+  &:last-child {
+    border-right: 0;
+  }
 
   &--active {
     background: #FFF;
-
-    &:after {
-      content: '';
-      width: 100%;
-      height: 1px;
-      position: absolute;
-      background: #FFF;
-      top: 100%;
-      left: 0;
-    }
   }
 }
 </style>

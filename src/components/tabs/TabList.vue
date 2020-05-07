@@ -9,9 +9,10 @@
   display: flex;
   flex-wrap: wrap;
   list-style: none;
-  font: 11px Volter, Roboto, Arial, sans-serif;
+  font: normal 11px Roboto, Arial, sans-serif;
   margin: 0;
   z-index: 1;
   position: relative;
+  overflow: hidden;
 }
 </style>

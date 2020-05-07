@@ -7,7 +7,8 @@ import {
   TabList,
   TabListItem,
   TabView,
-  TabContainer
+  TabContainer,
+  ScrollView
 } from './components'
 
 export * from './components'
@@ -23,5 +24,7 @@ export default class PixelUI {
     Vue.component('px-tab-list-item', TabListItem)
     Vue.component('px-tab-view', TabView)
     Vue.component('px-tab-container', TabContainer)
+
+    Vue.component('px-scrollview', ScrollView)
   }
 }

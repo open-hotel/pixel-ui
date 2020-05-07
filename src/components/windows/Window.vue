@@ -69,9 +69,8 @@
   font-size: 14px;
   max-width: 100%;
   outline: none;
-  transition: box-shadow 0.21s ease;
   font: 13px Roboto, Arial, sans-serif;
-  background: #568ba4;
+  background: #367897;
   overflow: hidden;
 
   &-title {
@@ -79,18 +78,24 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0.25em;
-    min-height: 32px;
-    border: 2px double #69a6c3;
+    padding: 4px;
+    height: 32px;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: default;
     position: relative;
+    font-weight: bold;
+    font: bold 12px 'Ubuntu', Arial, sans-serif;
+    box-shadow: inset 0 1px 0 2px #408CAF;
+    justify-content: flex-end;
 
     &-text {
       flex: 1;
+      position: absolute;
+      width: 100%;
       color: #FFF;
       text-align: center;
+      margin-top: -2px;
     }
   }
 
@@ -122,14 +127,13 @@
   }
 
   &--focused {
-    box-shadow: 0 4px 8px rgba(#000, 0.82), 0 4px 0 rgba(#000, 0.82);
     z-index: 99999999;
   }
 
   &-actions {
-    position: absolute;
-    right: 0.3em;
-    top: 0.3em;
+    margin-top: 1px;
+    position: relative;
+    z-index: 1;
   }
 
   &-action {
@@ -178,12 +182,12 @@
 
 .popup {
   &-enter-active, &-leave-active {
-    transition: all 0.4s cubic-bezier(0.75, -0.5, 0, 1.75);
+    transition: all 0.1s ease-out;
   }
 
   &-enter, &-leave-to {
-    transform: scale(0.8);
     opacity: 0;
+    transform: translate(0, -16px);
   }
 }
 </style>
@@ -213,7 +217,7 @@ export default class Window extends Vue {
   @Prop({ type: Number, default: 128 }) minHeight!: number
   @Prop({ type: Number, default: 800 }) maxWidth!: number
   @Prop({ type: Number, default: 600 }) maxHeight!: number
-  @Prop({ type: String, default: 'Message' }) title!: string
+  @Prop({ type: String, default: 'Inventário' }) title!: string
 
   @Watch('focused')
   private setFocused(focused: boolean) {

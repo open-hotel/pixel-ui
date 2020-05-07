@@ -18,77 +18,81 @@
         </px-tab-list>
         <px-tab-container>
           <px-tab-view v-model="tab" name="stats">
-            <table>
-              <thead>
-                <tr>
-                  <th>Property</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(value, key) in window" :key="key">
-                  <td>{{ key }}</td>
-                  <td class="center">
-                    <input
-                      v-if="typeof value === 'string'"
-                      v-model="window[key]"
-                    />
-                    <input
-                      v-else-if="typeof value === 'number'"
-                      type="number"
-                      v-model.number="window[key]"
-                    />
-                    <input
-                      v-else-if="typeof value === 'boolean'"
-                      type="checkbox"
-                      v-model="window[key]"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <px-scrollview>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(value, key) in window" :key="key">
+                    <td>{{ key }}</td>
+                    <td class="center">
+                      <input
+                        v-if="typeof value === 'string'"
+                        v-model="window[key]"
+                      />
+                      <input
+                        v-else-if="typeof value === 'number'"
+                        type="number"
+                        v-model.number="window[key]"
+                      />
+                      <input
+                        v-else-if="typeof value === 'boolean'"
+                        type="checkbox"
+                        v-model="window[key]"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </px-scrollview>
           </px-tab-view>
           <px-tab-view v-model="tab" name="buttons">
-            <table>
-              <thead>
-                <tr>
-                  <th>Context</th>
-                  <th>Button</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Default</td>
-                  <td class="center">
-                    <px-btn>Button</px-btn>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Success</td>
-                  <td class="center">
-                    <px-btn color="success">Button</px-btn>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Info</td>
-                  <td class="center">
-                    <px-btn color="info">Button</px-btn>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Warning</td>
-                  <td class="center">
-                    <px-btn color="warning">Button</px-btn>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Danger</td>
-                  <td class="center">
-                    <px-btn color="danger">Button</px-btn>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <px-scrollview>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Context</th>
+                    <th>Button</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Default</td>
+                    <td class="center">
+                      <px-btn>Button</px-btn>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Success</td>
+                    <td class="center">
+                      <px-btn color="success">Button</px-btn>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Info</td>
+                    <td class="center">
+                      <px-btn color="info">Button</px-btn>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Warning</td>
+                    <td class="center">
+                      <px-btn color="warning">Button</px-btn>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Danger</td>
+                    <td class="center">
+                      <px-btn color="danger">Button</px-btn>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </px-scrollview>
           </px-tab-view>
           <px-tab-view v-model="tab" name="me">
             <h1>Meus</h1>
@@ -145,10 +149,10 @@ export default class Home extends Vue {
         center: true,
         minimizable: true,
         closeable: true,
-        x: 0,
-        y: 0,
-        width: null,
-        height: null,
+        x: 120,
+        y: 90,
+        width: 487,
+        height: 320,
         minWidth: 128,
         minHeight: 128,
         maxWidth: 800,
