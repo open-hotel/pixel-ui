@@ -14,57 +14,32 @@ $shadowPressed = 50%;
 
 .px-btn {
   display: inline-block;
-  padding: 4px 16px;
+  padding: 1em 2em;
   font: 12px Roboto, Arial;
-  border-radius: 2px;
-  border: 1px solid #000;
+  border-radius: 0.5em;
   outline: none;
   cursor: pointer;
   position: relative;
-  margin: 2px;
+  margin: 0.25em;
   font-weight: bold;
-  box-shadow: 0 1px 0 #000;
+  border: 1px solid #000;
+  overflow: hidden;
 
-  &:before {
+  &:after {
     content: '';
     display: block;
     position: absolute;
-    top: 2px;
-    left: 2px;
-    right: 2px;
-    bottom: 50%;
-    z-index: 0;
-    transition: all 0.21s ease;
-  }
-
-  &-content {
-    position: relative;
-    z-index: 1;
-  }
-
-  &:active {
-    box-shadow: inset 2px 2px 0 rgba(#000, 82%);
+    background: rgba(#FFF, 50%);
+    height: 0.75em;
+    width: 100%;
+    top: 0;
+    left: 0;
   }
 
   for $name, $color in $theme {
-    $bgColor = darken($color, $shadow);
-
     &-{$name} {
-      background: $bgColor;
-      color: contrast($color, #000).ratio > 8 ? #000 : #FFF;
-
-      &:before {
-        background: $color;
-      }
-
-      &:active {
-        background: darken($bgColor, $shadowPressed);
-        color: contrast(darken($color, $shadowPressed), #000).ratio > 8 ? #000 : #FFF;
-
-        &:before {
-          background: darken($color, $shadowPressed);
-        }
-      }
+      background: $color;
+      color: contrast($color, #000).ratio > 9 ? #000 : #FFF;
     }
   }
 }

@@ -39,10 +39,8 @@
           </div>
         </div>
       </template>
-      <div class="window-content">
-        <div class="window-content-body">
-          <slot />
-        </div>
+      <div class="window-content" :style="dimensions">
+        <slot />
         <div class="window-footer">
           <slot name="footer" />
         </div>
@@ -95,23 +93,13 @@
       width: 100%;
       color: #FFF;
       text-align: center;
-      margin-top: -2px;
     }
   }
 
   &-content {
-    flex: 1;
+    flex: 0 auto;
     display: flex;
-    flex-direction: column;
-    overflow: auto;
     position: relative;
-
-    &-body {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-flow: column;
-    }
   }
 
   &-resizer {
@@ -187,7 +175,7 @@
 
   &-enter, &-leave-to {
     opacity: 0;
-    transform: translate(0, -16px);
+    transform: translate(0, 16px);
   }
 }
 </style>
@@ -393,12 +381,19 @@ export default class Window extends Vue {
       (parentEl && parentEl.offsetHeight - titlebar.offsetHeight) || Infinity
     const minX = (titlebar && 16 - titlebar.offsetWidth) || -Infinity
     const minY = 0
+
+    return {
+      top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
+      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`
+    }
+  }
+
+  get dimensions() {
+    const parentEl = this.$parent.$el as HTMLDivElement
     const maxWidth = (parentEl && parentEl.offsetWidth) || Infinity
     const maxHeight = (parentEl && parentEl.offsetHeight) || Infinity
 
     return {
-      top: `${this.normalizeValue(this.current.y, minY, maxY)}px`,
-      left: `${this.normalizeValue(this.current.x, minX, maxX)}px`,
       width: `${this.normalizeValue(this.current.width, 128, maxWidth)}px`,
       height: `${this.normalizeValue(this.current.height, 128, maxHeight)}px`
     }
